@@ -1,4 +1,4 @@
-{/* 
+/* 
 **Main Purpose**: This is the root layout component for LibreChat's authenticated 
 application area. It sets up the overall structure, manages global state, and handles 
 authentication-related UI.
@@ -26,7 +26,7 @@ The component essentially creates a wrapper that:
 - Renders the navigation and main content area
 - Handles terms of service acceptance
 - Provides a responsive layout structure
-*/}
+*/
 
 // Import React core functionality
 import React, { useState, useEffect } from 'react';

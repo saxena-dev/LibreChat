@@ -1,152 +1,284 @@
-/* 
-**Main Purpose**: This file acts as the central hub for LibreChat's state management 
-system, combining multiple specialized store modules into one unified store.
+// client/src/store/index.ts
 
-**Key Concepts**:
+/**
+ * LIBRECHAT CENTRAL STORE MODULE
+ * 
+ * This file serves as the main entry point for LibreChat's state management system.
+ * It follows a modular architecture pattern where different aspects of the application
+ * state are managed in separate modules, then combined here into one unified store.
+ * 
+ * ARCHITECTURAL PATTERN:
+ * - Each module handles a specific domain (user auth, settings, conversations, etc.)
+ * - This index file imports all modules and re-exports them as a single object
+ * - Components throughout the app can import this single store to access any functionality
+ * 
+ * TYPESCRIPT CONCEPTS DEMONSTRATED:
+ * - Module imports/exports with different syntaxes (default vs named exports)
+ * - Spread operator for object composition
+ * - Re-export patterns for creating unified APIs
+ * 
+ * BENEFITS OF THIS APPROACH:
+ * - Separation of concerns: Each module focuses on one responsibility
+ * - Maintainability: Changes to one feature don't affect others
+ * - Testability: Individual modules can be tested in isolation
+ * - Developer experience: Single import gives access to entire state system
+ */
 
-1. **Import/Export Pattern**: The file imports functionality from various modules and 
-re-exports them as one combined object
-2. **Spread Operator (`...`)**: Takes all properties from each module and combines 
-them into the final store object
-3. **Modular Architecture**: Instead of one massive store file, the app splits state 
-management into logical pieces (user data, settings, search, etc.)
+// IMPORT SECTION: Bringing in all state management modules
+// Each import represents a different slice of the application's state and functionality
 
-**How It's Used**: Other parts of the app can import this single store and access 
-any functionality from any of the individual modules, making the code more organized 
-and maintainable.
-*/
-
-// This file serves as the main entry point for the application's state management store
-// It imports and re-exports all the different store modules to create a centralized store
-
-// IMPORTS SECTION:
-// Each import statement brings in a different part of the application's state management
-// These are likely Zustand stores or similar state management modules
-
-// Import all exports from the artifacts module (using * as syntax)
-// The artifacts module probably handles AI-generated content like code, documents, etc.
+/**
+ * ARTIFACTS MODULE - Handles AI-generated content management
+ * Using "import * as" syntax to import all named exports as a single object
+ * This module likely manages code snippets, documents, and other AI-created content
+ */
 import * as artifacts from './artifacts';
 
-// Import the default export from each module
-// Each of these represents a different slice of the application state:
-
-// Handles different AI model families (like GPT, Claude, etc.)
+/**
+ * MODEL FAMILIES MODULE - Manages different AI model providers and configurations
+ * Default import pattern (the module exports a single main object)
+ * Handles things like GPT models, Claude models, and their specific settings
+ */
 import families from './families';
 
-// Manages API endpoints and connection settings
+/**
+ * ENDPOINTS MODULE - Manages API endpoints and connection configurations
+ * Handles different API providers, custom endpoints, and connection settings
+ * Critical for LibreChat's multi-provider architecture
+ */
 import endpoints from './endpoints';
 
-// Handles user authentication, profile, and user-specific data
+/**
+ * USER MODULE - Handles user authentication and profile management
+ * Manages login state, user preferences, authentication tokens, and user data
+ * Central to the application's security and personalization features
+ */
 import user from './user';
 
-// Manages text content, possibly including internationalization strings
+/**
+ * TEXT MODULE - Manages text content and possibly internationalization
+ * Could handle message content, text processing, or UI text strings
+ * Important for chat applications where text is the primary content type
+ */
 import text from './text';
 
-// Controls toast notifications (those popup messages you see in apps)
+/**
+ * TOAST MODULE - Controls notification system
+ * Manages those temporary popup messages that inform users about actions
+ * (success messages, error alerts, information notices, etc.)
+ */
 import toast from './toast';
 
-// Handles form submissions and their states (loading, success, error, etc.)
+/**
+ * SUBMISSION MODULE - Handles form submissions and their lifecycle
+ * Manages loading states, error handling, and success states for user interactions
+ * Critical for chat submissions, settings changes, and other user actions
+ */
 import submission from './submission';
 
-// Manages search functionality and search results
+/**
+ * SEARCH MODULE - Manages search functionality across the application
+ * Handles conversation search, message search, and search result management
+ * Important feature for users with large conversation histories
+ */
 import search from './search';
 
-// Handles conversation presets (saved conversation templates/configurations)
+/**
+ * PRESET MODULE - Manages conversation presets and templates
+ * Handles saved conversation configurations that users can quickly apply
+ * Allows users to set up recurring conversation patterns or model settings
+ */
 import preset from './preset';
 
-// Manages user-created prompts and prompt templates
+/**
+ * PROMPTS MODULE - Manages user-created prompts and prompt templates
+ * Handles the creation, storage, and management of reusable prompts
+ * Important for power users who create custom AI interaction patterns
+ */
 import prompts from './prompts';
 
-// Handles language/localization settings (probably for i18n - internationalization)
+/**
+ * LANGUAGE MODULE - Handles internationalization and localization
+ * Manages current language setting and probably translation strings
+ * Critical for LibreChat's global user base
+ */
 import lang from './language';
 
-// Manages application settings and user preferences
+/**
+ * SETTINGS MODULE - Manages application settings and user preferences
+ * Handles theme, notification preferences, API configurations, and other user settings
+ * Central to customizing the user experience
+ */
 import settings from './settings';
 
-// Handles miscellaneous state that doesn't fit in other categories
+/**
+ * MISC MODULE - Contains miscellaneous state that doesn't fit other categories
+ * Often used for utility functions, temporary state, or cross-cutting concerns
+ * Provides flexibility for state that doesn't warrant its own module
+ */
 import misc from './misc';
 
-// Manages temporary state that should be cleared on refresh/reload
+/**
+ * TEMPORARY MODULE - Manages ephemeral state
+ * Handles data that should be cleared on page refresh or session end
+ * Important for performance and preventing stale data issues
+ */
 import isTemporary from './temporary';
 
-// RE-EXPORT SECTION:
-// This line re-exports everything from the agents module
-// This allows other parts of the app to import agent-related functionality
-// directly from this main store file
+/**
+ * RE-EXPORT PATTERN
+ * This line re-exports all named exports from the agents module directly
+ * This allows other parts of the app to import agent functionality
+ * directly from this main store file without knowing the internal structure
+ * 
+ * Example: Instead of `import { agent } from '@/store/agents'`
+ * Components can use: `import { agent } from '@/store'`
+ */
 export * from './agents';
 
-// DEFAULT EXPORT:
-// This creates and exports a single object that combines all the store modules
-// The spread operator (...) takes all properties from each imported module
-// and combines them into one large store object
-
+/**
+ * MAIN STORE EXPORT
+ * This creates the unified store object by combining all imported modules
+ * using the spread operator (...) to merge all properties into one object
+ * 
+ * TYPESCRIPT SPREAD OPERATOR EXPLANATION:
+ * The spread operator takes all properties from an object and "spreads" them
+ * into the new object. If multiple modules export the same property name,
+ * the last one in the list will override the previous ones.
+ * 
+ * RESULTING STORE STRUCTURE:
+ * The final store object will contain all functions and state from every module,
+ * accessible as if they were all defined in one place.
+ */
 export default {
-  // Spread all properties from the artifacts module
-  // If artifacts exports { createArtifact, updateArtifact }, these become available here
+  /**
+   * ARTIFACTS - Spread all artifact-related functionality
+   * Might include: { createArtifact, updateArtifact, deleteArtifact, artifactsList }
+   * Handles AI-generated content like code blocks, documents, and media
+   */
   ...artifacts,
 
-  // Spread all properties from families module
-  // Might include things like { currentFamily, setFamily, availableFamilies }
+  /**
+   * FAMILIES - Spread all model family functionality
+   * Might include: { currentFamily, setFamily, availableFamilies, familySettings }
+   * Manages different AI model providers and their configurations
+   */
   ...families,
 
-  // Spread all properties from endpoints module
-  // Could include { apiUrl, setEndpoint, connectionStatus }
+  /**
+   * ENDPOINTS - Spread all endpoint management functionality
+   * Might include: { apiUrl, setEndpoint, connectionStatus, testConnection }
+   * Handles API connections and endpoint configurations
+   */
   ...endpoints,
 
-  // Spread all properties from user module
-  // Might have { currentUser, login, logout, userPreferences }
+  /**
+   * USER - Spread all user-related functionality
+   * Might include: { currentUser, login, logout, updateProfile, isAuthenticated }
+   * Manages user authentication state and profile information
+   */
   ...user,
 
-  // Spread all properties from text module
-  // Could contain { messages, updateText, textHistory }
+  /**
+   * TEXT - Spread all text management functionality
+   * Might include: { messages, updateText, textHistory, formatText }
+   * Handles text content and processing throughout the application
+   */
   ...text,
 
-  // Spread all properties from toast module
-  // Might include { showToast, hideToast, toastQueue }
+  /**
+   * TOAST - Spread all notification functionality
+   * Might include: { showToast, hideToast, toastQueue, clearAllToasts }
+   * Manages user notifications and feedback messages
+   */
   ...toast,
 
-  // Spread all properties from submission module
-  // Could have { isSubmitting, submitForm, submissionError }
+  /**
+   * SUBMISSION - Spread all form submission functionality
+   * Might include: { isSubmitting, submitMessage, submissionError, clearError }
+   * Handles the lifecycle of user interactions and form submissions
+   */
   ...submission,
 
-  // Spread all properties from search module
-  // Might contain { searchResults, performSearch, searchHistory }
+  /**
+   * SEARCH - Spread all search functionality
+   * Might include: { searchResults, performSearch, clearSearch, searchHistory }
+   * Manages search operations across conversations and messages
+   */
   ...search,
 
-  // Spread all properties from prompts module
-  // Could include { savedPrompts, createPrompt, deletePrompt }
+  /**
+   * PROMPTS - Spread all prompt management functionality
+   * Might include: { savedPrompts, createPrompt, updatePrompt, deletePrompt }
+   * Handles user-created prompts and prompt templates
+   */
   ...prompts,
 
-  // Spread all properties from preset module
-  // Might have { activePreset, savePreset, loadPreset }
+  /**
+   * PRESET - Spread all preset management functionality
+   * Might include: { activePreset, savePreset, loadPreset, deletePreset }
+   * Manages conversation presets and configuration templates
+   */
   ...preset,
 
-  // Spread all properties from language module
-  // Could contain { currentLanguage, setLanguage, translations }
+  /**
+   * LANGUAGE - Spread all internationalization functionality
+   * Might include: { currentLanguage, setLanguage, translations, availableLanguages }
+   * Handles language selection and localization
+   */
   ...lang,
 
-  // Spread all properties from settings module
-  // Might include { theme, notifications, apiSettings }
+  /**
+   * SETTINGS - Spread all settings functionality
+   * Might include: { theme, setTheme, notifications, apiSettings, saveSettings }
+   * Manages user preferences and application configuration
+   */
   ...settings,
 
-  // Spread all properties from misc module
-  // Could have various utility functions and state
+  /**
+   * MISC - Spread miscellaneous functionality
+   * Might include various utility functions and cross-cutting state
+   * Provides flexibility for features that don't fit in other categories
+   */
   ...misc,
 
-  // Spread all properties from temporary module
-  // Might contain { tempData, clearTemp, sessionState }
+  /**
+   * TEMPORARY - Spread temporary state functionality
+   * Might include: { tempData, clearTemp, sessionState, cacheData }
+   * Manages ephemeral data that shouldn't persist across sessions
+   */
   ...isTemporary,
 };
 
-// HOW THIS WORKS IN PRACTICE:
-// Other components in the app can import this store like:
-// import store from '@/store'
-// 
-// Then they can access any functionality from any module:
-// store.showToast('Hello!') // from toast module
-// store.setCurrentUser(userData) // from user module
-// store.performSearch(query) // from search module
-// 
-// This pattern is common in React applications using state management libraries
-// like Zustand, where you want to centralize all your state but keep it organized
-// in separate, focused modules.
+/**
+ * USAGE EXAMPLES IN COMPONENTS:
+ * 
+ * // Importing the unified store
+ * import store from '@/store';
+ * 
+ * // Accessing functionality from different modules
+ * store.showToast('Message sent successfully!'); // from toast module
+ * store.setCurrentUser(userData); // from user module
+ * store.performSearch('previous conversations'); // from search module
+ * store.savePreset(conversationConfig); // from preset module
+ * 
+ * // In React components with hooks (if using Zustand or similar)
+ * const currentUser = store.currentUser;
+ * const isSubmitting = store.isSubmitting;
+ * const searchResults = store.searchResults;
+ * 
+ * ADVANTAGES OF THIS PATTERN:
+ * 
+ * 1. SINGLE IMPORT: Components only need to import one store
+ * 2. MODULAR DEVELOPMENT: Each team member can work on separate modules
+ * 3. EASY TESTING: Individual modules can be tested in isolation
+ * 4. CLEAR ORGANIZATION: Related functionality is grouped together
+ * 5. SCALABILITY: New modules can be added without changing existing code
+ * 6. TYPE SAFETY: TypeScript can infer types from each module
+ * 
+ * COMMON STATE MANAGEMENT LIBRARIES THAT USE THIS PATTERN:
+ * - Zustand (lightweight state management)
+ * - Redux Toolkit (with store configuration)
+ * - Valtio (proxy-based state management)
+ * - Jotai (atomic state management)
+ */
